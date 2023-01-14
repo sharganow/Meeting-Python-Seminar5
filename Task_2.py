@@ -8,9 +8,11 @@
 # a) Добавьте игру против бота
 # b) Подумайте как наделить бота 'интеллектом'
 
+import random
+import time
+
 max_candy = 28
 min_candy = 1
-import random
 
 
 def get_quantity_candy() -> int:
@@ -26,12 +28,19 @@ def get_quantity_candy() -> int:
 
 
 confection = get_quantity_candy()
+time.sleep(random.randint(0, 10)/10)
 bot = random.randint(False, True)
 print(bot)
 
 while confection:
     if bot:
+        time.sleep(random.randint(0, 10) / 10)
+        if confection > max_candy:
+            confection -= random.randint(min_candy, max_candy)
+        else:
+            confection -= confection
+            print('Победил БОТ')
         bot = False
     else:
         bot = True
-
+        print(confection)
