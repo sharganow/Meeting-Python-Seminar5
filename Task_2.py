@@ -16,6 +16,11 @@ min_candy = 1
 confection = 2023
 
 
+def get_ures_name(plr: int) -> str:
+    name = input(f'Введите имя игрока №{plr}: ')
+    return name
+
+
 def get_quantity_candy() -> int:
     while True:
         try:
@@ -32,14 +37,15 @@ def take_candy() -> int:
     while True:
         try:
             number = abs(int(input(f'Возьмите конфеты: ')))
-            return number
+            break
         except:
             print('Должно быть введено положитеньное натуральное число')
+    return number
 
 
 def take_candy_from_confection(take: int, con: int) -> int:
-    if take == 0:
-        print('Вы не можете пропускать ход')
+    if take < min_candy:
+        print(f'Вы не можете забирать меньше {min_candy} конфет')
     elif take > max_candy:
         print(f'Больше {max_candy} конфет брать нельзя')
     elif take > con:
@@ -49,37 +55,64 @@ def take_candy_from_confection(take: int, con: int) -> int:
     return con
 
 
+def make_choce_bot(con: int) -> int:
+    time.sleep(random.randint(0, 10) / 10)  # иммитация мыслительного процесса - принятия решения
+    bot_choice = con % (max_candy + min_candy)
+    if bot_choice == 0:
+        bot_choice = min_candy  # тянем время - ожидаем ошибку оппонента
+    return bot_choice
+
+
+def make_choice_user(con: int) -> int:
+    own_choice = con
+    while own_choice == con:
+        own_choice = take_candy_from_confection(take_candy(), con)
+    return con - own_choice
+
+
+def choice_of_decision_algorithm(plrs: list, hmch: dict) -> dict:
+    for plr in plrs:
+        while True:
+            ch = input(f'Выберите метод принятия решения для игрока - {plr}\n'
+                       f'\t - если игрок играет сам, то введите текст \'сам\',\n'
+                       f'\t - если машина играет за него, то введите\'бот\': ')
+            match ch.lower():
+                case 'сам':
+                    hmch[plr] = make_choice_user
+                    break
+                case 'бот':
+                    hmch[plr] = make_choce_bot
+                    break
+                case _:
+                    print('Повторите попытку внимательнее')
+    return hmch
+
+
+def make_move(f, con: int) -> int:
+    return take_candy_from_confection(f(con), con)
+
+
+players = list()
+players.append(get_ures_name(1))
+players.append(get_ures_name(2))
+
+whoMakeChoice = dict()
+whoMakeChoice = choice_of_decision_algorithm(players, whoMakeChoice)
+
 confection = get_quantity_candy()
+
 time.sleep(random.randint(0, 10) / 10)
-bot = random.randint(False, True)
-print(bot)
+player = random.randint(False, True)
+print(f'По результату жеребьёвки первых ходит {players[player]}')
 
 while confection:
-    if bot:
-        time.sleep(random.randint(0, 10) / 10)
-        if max_candy * 3 < confection:
-            confection = take_candy_from_confection(max_candy, confection)
-        elif max_candy * 2 + 1 <= confection < max_candy * 3:
-            confection = take_candy_from_confection(confection - (max_candy * 2), confection)
-        elif max_candy + 1 < confection < max_candy * 2:
-            confection = take_candy_from_confection(confection - (max_candy + 1), confection)
-        elif confection <= max_candy:
-            confection = take_candy_from_confection(confection, confection)
-            if not confection:
-                print('Победил БОТ')
-                break
-        else:
-            confection = take_candy_from_confection(1, confection)
-            print(f'Что-то пошло не так {confection}')
-        bot = False
-        print(f'Ход сделал БОТ {confection}')
+    confection = make_move(whoMakeChoice[players[player]], confection)
+    if not confection:
+        print(f'Победил {players[player]}')
+        break
     else:
-        own_choce = confection
-        while own_choce == confection:
-            own_choce = take_candy_from_confection(take_candy(), confection)
-        confection = own_choce
-        if not confection:
-            print('Победил Пользователь')
-            break
-        print(f'Ход сделал пользователь {confection}')
-        bot = True
+        print(f'Ход сделал {players[player]}, осталось {confection} конфет')
+    if player:
+        player = False
+    else:
+        player = True
