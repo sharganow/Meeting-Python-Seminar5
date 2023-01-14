@@ -42,17 +42,17 @@ def remove_words_with_elim(src_txt: str, elm: str, splt: str) -> str:
             while (src_txt[start_ind] not in splt) and (start_ind > 0):
                 start_ind -= 1
         stop_ind = ind + len(elm)
-        if stop_ind < len(src_txt) - 1:
-            while (src_txt[stop_ind] not in splt) and (stop_ind < len(src_txt) - 1):
+        if stop_ind < len(src_txt):
+            while (src_txt[stop_ind] not in splt) and (stop_ind < len(src_txt)):
                 stop_ind += 1
         if start_ind == 0:
             if len(src_txt) > stop_ind + 2:
-                src_txt = src_txt[stop_ind + 2:]
-            else:
                 src_txt = src_txt[stop_ind + 1:]
-        elif stop_ind == len(src_txt) - 1:
+            else:
+                src_txt = src_txt[stop_ind:]
+        elif stop_ind == len(src_txt):
             if start_ind > 0:
-                src_txt = src_txt[:start_ind]
+                src_txt = src_txt[:start_ind] + src_txt[stop_ind:]
             else:
                 src_txt = ' '
         else:
