@@ -56,7 +56,7 @@ def take_candy_from_confection(take: int, con: int) -> int:
 
 
 def make_choce_bot(con: int) -> int:
-    time.sleep(random.randint(0, 10) / 10)  # иммитация мыслительного процесса - принятия решения
+    time.sleep(random.randint(0, 11) / 10)  # иммитация мыслительного процесса - принятия решения
     bot_choice = con % (max_candy + min_candy)
     if bot_choice == 0:
         bot_choice = min_candy  # тянем время - ожидаем ошибку оппонента
