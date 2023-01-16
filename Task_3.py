@@ -1,27 +1,19 @@
 # Создайте программу для игры в 'Крестики-нолики'
 # НЕОБЯЗАТЕЛЬНО Добавить игру против бота с интеллектом
 
+import random
+import time
+
+gameBoard = []
+maxScore = 11
+players = []
+whoMakeChoice = dict()
+userSign = dict()
+
 
 def get_user_name(plr: int) -> str:
     name = input(f'Введите имя игрока №{plr}: ')
     return name
-
-
-def choice_of_decision_algorithm(plrs: list, hmch: dict):
-    for plr in plrs:
-        while True:
-            ch = input(f'Выберите метод принятия решения для игрока - {plr}\n'
-                       f'\t - если игрок играет сам, то введите текст \'сам\',\n'
-                       f'\t - если машина играет за него, то введите\'бот\': ')
-            match ch.lower():
-                case 'сам':
-                    hmch[plr] = ch
-                    break
-                case 'бот':
-                    hmch[plr] = ch
-                    break
-                case _:
-                    print('Повторите попытку внимательнее')
 
 
 def choice_sign_to_play(plrs: list, hmch: dict):
@@ -83,26 +75,152 @@ def enter_sign(board: list, entr: int, sign: str):
     else:
         print('Выбранная ячейка занята')
 
-def
 
+def get_free_fields(board: list) -> list:
+    listReturn = list()
+    for i in range(3):
+        for j in range(3):
+            if board[i][j] in range(9):
+                listReturn.append(board[i][j])
+    return listReturn
+
+
+def get_progress_score(board: list, depth: int, own_player: int, move_player: int) -> int:
+    match_winner = search_for_a_winner(board)
+    match match_winner:
+        case 'No':
+            virtualBoard = [[(board[string][column]) for column in range(3)] for string in range(3)]
+            # virtualBoard = board.copy()     # Проблема -  не создаёт отдельный список
+            freeFields = get_free_fields(virtualBoard)
+            if len(freeFields) == 0:
+                return 0
+            else:
+                move_player = 0 if move_player else 1
+                weightValues = list()
+                for i in freeFields:
+                    enter_sign(virtualBoard, i, userSign[players[move_player]])
+                    weightValues.append(get_progress_score(virtualBoard, depth + 1, own_player, move_player))
+                maxWeight = weightValues[0]
+                for i in weightValues:
+                    if abs(maxWeight) < abs(i):
+                        maxWeight = i
+                return maxWeight
+        case _:
+            if match_winner == userSign[players[move_player]]:
+                if move_player == own_player:
+                    return maxScore - depth
+                else:
+                    return depth - maxScore
+            else:
+                print('Произошел сбой маркеровки оппонента при выполнении виртуального хода')
+
+
+def make_a_custom_move(board: list, move_player: int) -> int:
+    freeFields = get_free_fields(board)
+    if len(freeFields) != 0:
+        move = None
+        while True:
+            move = int(input(f'Ход производит {players[move_player]}, выберите поле: '))
+            if move in freeFields:
+                break
+            else:
+                print('Выбор должен быть сделан из следующих значений: ', end='')
+                print(*freeFields)
+        enter_sign(board, move, userSign[players[move_player]])
+        showBoard(board)
+        match_winner = search_for_a_winner(board)
+        match match_winner:
+            case 'No':
+                return 1
+            case _:
+                if match_winner == userSign[players[move_player]]:
+                    print(f'Игра окончена, победил {players[move_player]}!')
+                else:
+                    print('Произошел сбой маркеровки победителя, Игра окончена неожиданностью')
+                return 0
+    else:
+        print(f'Ход производит {players[move_player]}, но игра уже закончена')
+        return 0
+
+
+def make_a_bot_move(board: list, move_player: int) -> int:
+    freeFields = get_free_fields(board)
+    if len(freeFields) != 0:
+        virtualBoard = [[(board[string][column]) for column in range(3)] for string in range(3)]
+        weightValues = list()
+        for i in freeFields:
+            enter_sign(virtualBoard, i, userSign[players[move_player]])
+            weightValues.append(get_progress_score(virtualBoard, 0, move_player, move_player))
+        maxWeight = weightValues[0]
+        indexMaxWeight = 0
+        for i, d in enumerate(weightValues):
+            if maxWeight < d:
+                maxWeight = d
+                indexMaxWeight = i
+        print(f'Ход производит {players[move_player]}: ')
+        enter_sign(board, freeFields[indexMaxWeight], userSign[players[move_player]])
+        showBoard(board)
+        match_winner = search_for_a_winner(board)
+        match match_winner:
+            case 'No':
+                return 1
+            case _:
+                if match_winner == userSign[players[move_player]]:
+                    print(f'Игра окончена, победил {players[move_player]}!')
+                else:
+                    print('Произошел сбой маркеровки победителя, Игра окончена неожиданностью')
+                return 0
+    else:
+        print(f'Ход производит {players[move_player]}, но игра уже закончена')
+        return 0
+
+
+def make_move(f, board: list, move_player: int) -> int:
+    return f(board, move_player)
+
+
+def choice_of_decision_algorithm(plrs: list, hmch: dict):
+    for plr in plrs:
+        while True:
+            ch = input(f'Выберите метод принятия решения для игрока - {plr}\n'
+                       f'\t - если игрок играет сам, то введите текст \'сам\',\n'
+                       f'\t - если машина играет за него, то введите\'бот\': ')
+            match ch.lower():
+                case 'сам':
+                    hmch[plr] = make_a_custom_move
+                    break
+                case 'бот':
+                    hmch[plr] = make_a_bot_move
+                    break
+                case _:
+                    print('Повторите попытку внимательнее')
 
 
 gameBoard = [[(string * 3 + column) for column in range(3)] for string in range(3)]
-# players = [get_user_name(i) for i in range(1, 3)]
-#
-# whoMakeChoice = dict()
-# choice_of_decision_algorithm(players, whoMakeChoice)
-# userSign = dict()
-# choice_sign_to_play(players, userSign)
-#
+players = [get_user_name(i) for i in range(1, 3)]
+choice_of_decision_algorithm(players, whoMakeChoice)
+choice_sign_to_play(players, userSign)
+showBoard(gameBoard)
+
+time.sleep(random.randint(0, 10) / 10)
+player = random.randint(0, 1)
+print(f'По результату жеребьёвки первых ходит {players[player]}')
+
+while True:
+    if make_move(whoMakeChoice[players[player]], gameBoard, player):
+        player = 0 if player else 1
+    else:
+        break
+
 # print(*sorted(whoMakeChoice.items()))
-showBoard(gameBoard)
-print(search_for_a_winner(gameBoard))
-
-gameBoard[2][0] = gameBoard[1][1] = gameBoard[0][2] = 'Y'
-showBoard(gameBoard)
-enter_sign(gameBoard, int(input('Выберите поле: ')), 'X')
-showBoard(gameBoard)
-
-print(search_for_a_winner(gameBoard))
-
+# currentMove = 0
+#
+# print(search_for_a_winner(gameBoard))
+#
+# gameBoard[2][0] = gameBoard[1][1] = gameBoard[0][2] = 'Y'
+# showBoard(gameBoard)
+# enter_sign(gameBoard, int(input('Выберите поле: ')), 'X')
+# showBoard(gameBoard)
+#
+# print(search_for_a_winner(gameBoard))
+# print(*get_free_fields(gameBoard))
