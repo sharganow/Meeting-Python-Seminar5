@@ -90,16 +90,16 @@ def get_progress_score(board: list, depth: int, own_player: int, move_player: in
     match match_winner:
         case 'No':
             virtualBoard = [[(board[string][column]) for column in range(3)] for string in range(3)]
-            # virtualBoard = board.copy()     # Проблема -  не создаёт отдельный список
             freeFields = get_free_fields(virtualBoard)
             if len(freeFields) == 0:
                 return 0
             else:
-                move_player = 0 if move_player else 1
+                next_move = 0 if move_player else 1
                 weightValues = list()
                 for i in freeFields:
-                    enter_sign(virtualBoard, i, userSign[players[move_player]])
-                    weightValues.append(get_progress_score(virtualBoard, depth + 1, own_player, move_player))
+                    enter_sign(virtualBoard, i, userSign[players[next_move]])
+                    weightValues.append(get_progress_score(virtualBoard, depth + 1, own_player, next_move))
+                    virtualBoard = [[(board[string][column]) for column in range(3)] for string in range(3)]
                 maxWeight = weightValues[0]
                 for i in weightValues:
                     if abs(maxWeight) < abs(i):
@@ -139,7 +139,7 @@ def make_a_custom_move(board: list, move_player: int) -> int:
                     print('Произошел сбой маркеровки победителя, Игра окончена неожиданностью')
                 return 0
     else:
-        print(f'Ход производит {players[move_player]}, но игра уже закончена')
+        print(f'Игра закончена - ничья')
         return 0
 
 
@@ -151,6 +151,7 @@ def make_a_bot_move(board: list, move_player: int) -> int:
         for i in freeFields:
             enter_sign(virtualBoard, i, userSign[players[move_player]])
             weightValues.append(get_progress_score(virtualBoard, 0, move_player, move_player))
+            virtualBoard = [[(board[string][column]) for column in range(3)] for string in range(3)]
         maxWeight = weightValues[0]
         indexMaxWeight = 0
         for i, d in enumerate(weightValues):
@@ -171,7 +172,7 @@ def make_a_bot_move(board: list, move_player: int) -> int:
                     print('Произошел сбой маркеровки победителя, Игра окончена неожиданностью')
                 return 0
     else:
-        print(f'Ход производит {players[move_player]}, но игра уже закончена')
+        print(f'Игра закончена - ничья')
         return 0
 
 
@@ -197,6 +198,8 @@ def choice_of_decision_algorithm(plrs: list, hmch: dict):
 
 
 gameBoard = [[(string * 3 + column) for column in range(3)] for string in range(3)]
+# gameBoard[0][2]=gameBoard[1][2]=gameBoard[1][0]='Х'
+# gameBoard[0][0]=gameBoard[2][1]=gameBoard[2][2]='О'
 players = [get_user_name(i) for i in range(1, 3)]
 choice_of_decision_algorithm(players, whoMakeChoice)
 choice_sign_to_play(players, userSign)
@@ -204,23 +207,10 @@ showBoard(gameBoard)
 
 time.sleep(random.randint(0, 10) / 10)
 player = random.randint(0, 1)
-print(f'По результату жеребьёвки первых ходит {players[player]}')
+print(f'По результату жеребьёвки первым ходит {players[player]}')
 
 while True:
     if make_move(whoMakeChoice[players[player]], gameBoard, player):
         player = 0 if player else 1
     else:
         break
-
-# print(*sorted(whoMakeChoice.items()))
-# currentMove = 0
-#
-# print(search_for_a_winner(gameBoard))
-#
-# gameBoard[2][0] = gameBoard[1][1] = gameBoard[0][2] = 'Y'
-# showBoard(gameBoard)
-# enter_sign(gameBoard, int(input('Выберите поле: ')), 'X')
-# showBoard(gameBoard)
-#
-# print(search_for_a_winner(gameBoard))
-# print(*get_free_fields(gameBoard))
