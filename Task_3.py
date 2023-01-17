@@ -85,14 +85,17 @@ def get_free_fields(board: list) -> list:
     return listReturn
 
 
-def get_progress_score(board: list, depth: int, own_player: int, move_player: int) -> int:
+def get_progress_score(board: list, depth: int, own_player: int, move_player: int) -> list:
+    weightList = list()
     match_winner = search_for_a_winner(board)
     match match_winner:
         case 'No':
             virtualBoard = [[(board[string][column]) for column in range(3)] for string in range(3)]
             freeFields = get_free_fields(virtualBoard)
             if len(freeFields) == 0:
-                return 0
+                weightList.append(0)
+                weightList.append(0)
+                return weightList
             else:
                 next_move = 0 if move_player else 1
                 weightValues = list()
@@ -100,19 +103,26 @@ def get_progress_score(board: list, depth: int, own_player: int, move_player: in
                     enter_sign(virtualBoard, i, userSign[players[next_move]])
                     weightValues.append(get_progress_score(virtualBoard, depth + 1, own_player, next_move))
                     virtualBoard = [[(board[string][column]) for column in range(3)] for string in range(3)]
-                maxWeight = weightValues[0]
-                for i in weightValues:
-                    if abs(maxWeight) < abs(i):
-                        maxWeight = i
-                return maxWeight
+                maxWeight = weightValues[0][0]
+                collectAllbranches = 0
+                for i, d in enumerate(weightValues):
+                    if abs(maxWeight) < abs(weightValues[i][0]):
+                        maxWeight = weightValues[i][0]
+                    collectAllbranches = weightValues[i][0] + weightValues[i][1]
+                weightList.append(maxWeight)
+                weightList.append(collectAllbranches)
+                return weightList
         case _:
             if match_winner == userSign[players[move_player]]:
                 if move_player == own_player:
-                    return maxScore - depth
+                    weightList.append(maxScore - depth)
                 else:
-                    return depth - maxScore
+                    weightList.append(depth - maxScore)
             else:
                 print('Произошел сбой маркеровки оппонента при выполнении виртуального хода')
+                weightList.append(0)
+            weightList.append(0)
+            return weightList
 
 
 def make_a_custom_move(board: list, move_player: int) -> int:
@@ -152,12 +162,15 @@ def make_a_bot_move(board: list, move_player: int) -> int:
             enter_sign(virtualBoard, i, userSign[players[move_player]])
             weightValues.append(get_progress_score(virtualBoard, 0, move_player, move_player))
             virtualBoard = [[(board[string][column]) for column in range(3)] for string in range(3)]
-        maxWeight = weightValues[0]
+        maxWeight = weightValues[0][0]
         indexMaxWeight = 0
         for i, d in enumerate(weightValues):
-            if maxWeight < d:
-                maxWeight = d
+            if maxWeight < weightValues[i][0]:
+                maxWeight = weightValues[i][0]
                 indexMaxWeight = i
+            elif maxWeight == weightValues[i][0]:
+                if weightValues[i][1] > weightValues[indexMaxWeight][1]:
+                    indexMaxWeight = i
         print(f'Ход производит {players[move_player]}: ')
         enter_sign(board, freeFields[indexMaxWeight], userSign[players[move_player]])
         showBoard(board)
