@@ -31,7 +31,7 @@ def compressFile(orig: str) -> str:
                     char = char[-1]
                 else:
                     char += ch
-                    i = 2
+                    i = 1
                     while True:
                         if i > len(char) // 2:
                             break
