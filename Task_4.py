@@ -4,6 +4,9 @@
 # aaaaabbbcccc -> 5a3b4c
 # 5a3b4c -> aaaaabbbcccc
 
+# PS взял на себя смелость и изменил условия задачи - коэффициенты сжатия у меня на 1 меньше,
+# и добавил поиск одинаковых фрагментов
+
 
 def compressFile(orig: str) -> str:
     compress = ''
