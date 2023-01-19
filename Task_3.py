@@ -76,22 +76,13 @@ def enter_sign(board: list, entr: int, sign: str):
         print('Выбранная ячейка занята')
 
 
-def get_free_fields(board: list) -> list:
-    listReturn = list()
-    for i in range(3):
-        for j in range(3):
-            if board[i][j] in range(9):
-                listReturn.append(board[i][j])
-    return listReturn
-
-
 def get_progress_score(board: list, depth: int, own_player: int, move_player: int) -> list:
     weightList = list()
     match_winner = search_for_a_winner(board)
     match match_winner:
         case 'No':
             virtualBoard = [[(board[string][column]) for column in range(3)] for string in range(3)]
-            freeFields = get_free_fields(virtualBoard)
+            freeFields = [k for i, d in enumerate(board) for j, k in enumerate(d) if k in range(9)]
             if len(freeFields) == 0:
                 weightList.append(0)
                 weightList.append(0)
@@ -126,7 +117,7 @@ def get_progress_score(board: list, depth: int, own_player: int, move_player: in
 
 
 def make_a_custom_move(board: list, move_player: int) -> int:
-    freeFields = get_free_fields(board)
+    freeFields = [k for i, d in enumerate(board) for j, k in enumerate(d) if k in range(9)]
     if len(freeFields) != 0:
         move = None
         while True:
@@ -154,7 +145,7 @@ def make_a_custom_move(board: list, move_player: int) -> int:
 
 
 def make_a_bot_move(board: list, move_player: int) -> int:
-    freeFields = get_free_fields(board)
+    freeFields = [k for i, d in enumerate(board) for j, k in enumerate(d) if k in range(9)]
     if len(freeFields) != 0:
         virtualBoard = [[(board[string][column]) for column in range(3)] for string in range(3)]
         weightValues = list()
