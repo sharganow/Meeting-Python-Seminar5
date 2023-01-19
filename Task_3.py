@@ -108,7 +108,7 @@ def get_progress_score(board: list, depth: int, own_player: int, move_player: in
                 for i, d in enumerate(weightValues):
                     if abs(maxWeight) < abs(weightValues[i][0]):
                         maxWeight = weightValues[i][0]
-                    collectAllbranches = weightValues[i][0] + weightValues[i][1]
+                    collectAllbranches += weightValues[i][0] + weightValues[i][1]
                 weightList.append(maxWeight)
                 weightList.append(collectAllbranches)
                 return weightList
@@ -211,8 +211,6 @@ def choice_of_decision_algorithm(plrs: list, hmch: dict):
 
 
 gameBoard = [[(string * 3 + column) for column in range(3)] for string in range(3)]
-# gameBoard[0][2]=gameBoard[1][2]=gameBoard[1][0]='Х'
-# gameBoard[0][0]=gameBoard[2][1]=gameBoard[2][2]='О'
 players = [get_user_name(i) for i in range(1, 3)]
 choice_of_decision_algorithm(players, whoMakeChoice)
 choice_sign_to_play(players, userSign)
