@@ -85,43 +85,43 @@ def get_free_fields(board: list) -> list:
     return listReturn
 
 
-def get_progress_score(board: list, depth: int, own_player: int, move_player: int) -> list:
-    weightList = list()
+def get_progress_score(board: list, depth: int, own_player: int, move_player: int) -> str:
+    weightList = ''
     match_winner = search_for_a_winner(board)
     match match_winner:
         case 'No':
             virtualBoard = [[(board[string][column]) for column in range(3)] for string in range(3)]
             freeFields = get_free_fields(virtualBoard)
             if len(freeFields) == 0:
-                weightList.append(0)
-                weightList.append(0)
-                return weightList
+                return '0=0'
             else:
                 next_move = 0 if move_player else 1
-                weightValues = list()
+                weightValues = ''
                 for i in freeFields:
                     enter_sign(virtualBoard, i, userSign[players[next_move]])
-                    weightValues.append(get_progress_score(virtualBoard, depth + 1, own_player, next_move))
+                    weightValues += ' ' + get_progress_score(virtualBoard, depth + 1, own_player, next_move)
                     virtualBoard = [[(board[string][column]) for column in range(3)] for string in range(3)]
+                weightValues = weightValues.strip()
+                weightValues = [[int(j) for j in map(str, i.split('='))] for i in map(str.strip, weightValues.split())]
                 maxWeight = weightValues[0][0]
                 collectAllbranches = 0
                 for i, d in enumerate(weightValues):
                     if abs(maxWeight) < abs(weightValues[i][0]):
                         maxWeight = weightValues[i][0]
-                    collectAllbranches = weightValues[i][0] + weightValues[i][1]
-                weightList.append(maxWeight)
-                weightList.append(collectAllbranches)
+                    collectAllbranches += weightValues[i][0] + weightValues[i][1]
+                weightList = str(maxWeight)
+                weightList += '=' + str(collectAllbranches)
                 return weightList
         case _:
             if match_winner == userSign[players[move_player]]:
                 if move_player == own_player:
-                    weightList.append(maxScore - depth)
+                    weightList = str(maxScore - depth)
                 else:
-                    weightList.append(depth - maxScore)
+                    weightList = str(depth - maxScore)
             else:
                 print('Произошел сбой маркеровки оппонента при выполнении виртуального хода')
-                weightList.append(0)
-            weightList.append(0)
+                weightList = str(0)
+            weightList += '=' + str(0)
             return weightList
 
 
@@ -157,11 +157,13 @@ def make_a_bot_move(board: list, move_player: int) -> int:
     freeFields = get_free_fields(board)
     if len(freeFields) != 0:
         virtualBoard = [[(board[string][column]) for column in range(3)] for string in range(3)]
-        weightValues = list()
+        weightValues = ''
         for i in freeFields:
             enter_sign(virtualBoard, i, userSign[players[move_player]])
-            weightValues.append(get_progress_score(virtualBoard, 0, move_player, move_player))
+            weightValues += ' ' + get_progress_score(virtualBoard, 0, move_player, move_player)
             virtualBoard = [[(board[string][column]) for column in range(3)] for string in range(3)]
+        weightValues = weightValues.strip()
+        weightValues = [[int(j) for j in map(str, i.split('='))] for i in map(str.strip, weightValues.split())]
         maxWeight = weightValues[0][0]
         indexMaxWeight = 0
         for i, d in enumerate(weightValues):
@@ -211,8 +213,6 @@ def choice_of_decision_algorithm(plrs: list, hmch: dict):
 
 
 gameBoard = [[(string * 3 + column) for column in range(3)] for string in range(3)]
-# gameBoard[0][2]=gameBoard[1][2]=gameBoard[1][0]='Х'
-# gameBoard[0][0]=gameBoard[2][1]=gameBoard[2][2]='О'
 players = [get_user_name(i) for i in range(1, 3)]
 choice_of_decision_algorithm(players, whoMakeChoice)
 choice_sign_to_play(players, userSign)
