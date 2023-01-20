@@ -16,7 +16,7 @@ min_candy = 1
 confection = 2023
 
 
-def get_ures_name(plr: int) -> str:
+def get_user_name(plr: int) -> str:
     name = input(f'Введите имя игрока №{plr}: ')
     return name
 
@@ -92,12 +92,8 @@ def make_move(f, con: int) -> int:
     return take_candy_from_confection(f(con), con)
 
 
-players = list()
-players.append(get_ures_name(1))
-players.append(get_ures_name(2))
-
-whoMakeChoice = dict()
-whoMakeChoice = choice_of_decision_algorithm(players, whoMakeChoice)
+players = [get_user_name(i) for i in range(1, 3)]
+whoMakeChoice = choice_of_decision_algorithm(players, dict())
 
 confection = get_quantity_candy()
 
