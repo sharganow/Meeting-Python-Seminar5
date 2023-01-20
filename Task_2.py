@@ -99,7 +99,7 @@ confection = get_quantity_candy()
 
 time.sleep(random.randint(0, 10) / 10)
 player = random.randint(0, 1)
-print(f'По результату жеребьёвки первых ходит {players[player]}')
+print(f'По результату жеребьёвки первый ходит {players[player]}')
 
 while confection:
     confection = make_move(whoMakeChoice[players[player]], confection)
