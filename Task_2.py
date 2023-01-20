@@ -102,7 +102,7 @@ whoMakeChoice = choice_of_decision_algorithm(players, whoMakeChoice)
 confection = get_quantity_candy()
 
 time.sleep(random.randint(0, 10) / 10)
-player = random.randint(False, True)
+player = random.randint(0, 1)
 print(f'По результату жеребьёвки первых ходит {players[player]}')
 
 while confection:
@@ -112,7 +112,4 @@ while confection:
         break
     else:
         print(f'Ход сделал {players[player]}, осталось {confection} конфет')
-    if player:
-        player = False
-    else:
-        player = True
+    player = 0 if player else 1
