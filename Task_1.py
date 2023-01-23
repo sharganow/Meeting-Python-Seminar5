@@ -2,13 +2,13 @@
 
 # p.s. Реализовал с чтением из файла "text.txt" и сохранением файл результата "text_cut.txt"
 
-def make_text_dictionary(d: dict, s: str) -> dict:
-    for i in s:
-        if i in d:
-            continue
-        else:
-            d[i] = ord(i)
-    return d
+# def make_text_dictionary(d: dict, s: str) -> dict:
+#     for i in s:
+#         if i in d:
+#             continue
+#         else:
+#             d[i] = ord(i)
+#     return d
 
 
 def get_eliminator(keys: str, text: str, ln: int) -> str:
@@ -79,19 +79,16 @@ while True:
                            'Я самый яростный попутчик.']
             data.write(sourse_text)
 
-dct = make_text_dictionary(dict(), sourse_text.lower())
-dct = make_text_dictionary(dct, sourse_text.upper())
-txt_keys = sorted(dct.keys())
+# dct = make_text_dictionary(dict(), sourse_text.lower())
+# dct = make_text_dictionary(dct, sourse_text.upper())
+txt_keys = sorted(dict.fromkeys([i for i in sourse_text.lower() + sourse_text.upper()]))
+# txt_keys = sorted(dct.keys())
 split_keys = [x for x in txt_keys if x < 'Ё' or 'ё' < x]
 alpha_keys = [x for x in txt_keys if x not in split_keys]
 elim = get_eliminator(alpha_keys, sourse_text, 3)
 
 sourse_text = remove_words_with_elim(sourse_text, elim, split_keys)
 
-with open('text_cut.txt', "w") as data:
-    data.write(sourse_text)
+with open('text_cut.txt', "w") as file:
+    file.write(sourse_text)
 
-# print(*sorted(dct.items()))
-# print(*txt_keys)
-# print(*split_keys)
-# print(*alpha_keys)
