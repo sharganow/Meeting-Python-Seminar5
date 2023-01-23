@@ -1,11 +1,11 @@
 # Создайте программу для игры в 'Крестики-нолики'
 # НЕОБЯЗАТЕЛЬНО Добавить игру против бота с интеллектом
 
-import random
+import Randomizer as rnd
 import time
 
 gameBoard = []
-maxScore = 11
+maxScore = 10
 players = []
 whoMakeChoice = dict()
 userSign = dict()
@@ -207,8 +207,8 @@ choice_of_decision_algorithm(players, whoMakeChoice)
 choice_sign_to_play(players, userSign)
 showBoard(gameBoard)
 
-time.sleep(random.randint(0, 10) / 10)
-player = random.randint(0, 1)
+time.sleep(rnd.RandInt(0, 10) / 10)
+player = rnd.RandInt(0, 1)
 print(f'По результату жеребьёвки первым ходит {players[player]}')
 
 while True:
